@@ -6,7 +6,7 @@ const imagesRef = db.collection("images");
 
 exports.handler = async () => {
   const data = [];
-  const snapsphot = await imagesRef.orderBy('createdAt', 'desc').get();
+  const snapsphot = await imagesRef.orderBy("createdAt", "desc").get();
 
   snapsphot.forEach((doc) => {
     data.push({
