@@ -1,7 +1,6 @@
 require("../../firebase/init");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getStorage } = require("firebase-admin/storage");
-const fs = require("fs");
 const { Buffer } = require("buffer");
 const busboy = require("busboy");
 
@@ -30,11 +29,6 @@ exports.handler = async (event) => {
     const bb = busboy({ headers: event.headers });
     bb.on("file", (name, file, info) => {
       const { filename } = info;
-      if (!fs.existsSync("assets")) {
-        fs.mkdirSync("assets");
-      }
-
-      // file.pipe(fs.createWriteStream(`assets/${filename}`));
       file
         .pipe(bucket.file(`images/${filename}`).createWriteStream())
         .on("finish", () => {
@@ -61,57 +55,7 @@ exports.handler = async (event) => {
 
               resolve(data);
             });
-        });
-
-      // file.on('finish', () => {
-      //   bucket.getFiles(function (err, files) {
-      //     [...files].forEach((file) => {
-      //       console.log(file.metadata);
-      //       console.log(file.name);
-      //     });
-      //   });
-      //   bucket.file(`images/${filename}`).getMetadata((err, newFile, response) => {
-      //     console.log(newFile);
-      //   });
-      // })
-
-      // file.on("end", () => {
-      //   bucket.upload(
-      //     `assets/${filename}`,
-      //     {
-      //       destination: `images/${filename}`,
-      //     },
-      //     async function (err, newFile, response) {
-      //       if (err) {
-      //         console.log(err);
-      //       }
-
-      //       fs.rm(`assets/${filename}`, function (err) {
-      //         console.log(err);
-      //       });
-
-      //       await uploadToFirestore(
-      //         filename,
-      //         response.mediaLink,
-      //         response.timeCreated
-      //       );
-
-      //       const data = [];
-      //       const snapsphot = await imagesRef
-      //         .orderBy("createdAt", "desc")
-      //         .get();
-
-      //       snapsphot.forEach((doc) => {
-      //         data.push({
-      //           id: doc.id,
-      //           ...doc.data(),
-      //         });
-      //       });
-
-      //       resolve(data);
-      //     }
-      //   );
-      // });
+        });      
     });
 
     bb.write(Buffer.from(body, "base64"));
